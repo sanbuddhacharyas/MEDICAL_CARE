@@ -1,13 +1,15 @@
 import gatt
 from login import *
-
+import tkinter as tk
+from tkinter import *
+from functools import partial
+from database import Database
 from BLE import BLE
 
 if __name__ == "__main__":
     root=Tk()
     #input_text=StringVar()
-    user_name=StringVar()
-    pass_word=StringVar()
+
     device = Database()
     localhost = 27017
     database = "Medicare_report"

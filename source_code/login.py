@@ -1,9 +1,9 @@
-from tkinter import *
 import tkinter as tk
+from tkinter import *
 from functools import partial
 from database import Database
 
-expression=None
+
 
 class curry:
     def __init__(self, fun, *args, **kwargs):
@@ -23,31 +23,17 @@ class curry:
 
 # ---------- code for function: event_lambda (begin) --------
 def event_lambda(f, *args, **kwds ):
-
     return lambda event, f=f, args=args, kwds=kwds : f( *args, **kwds )
 # ---------- code for function: event_lambda (end) -----------
-def btn_click(item):
-    global expression
-    if expression is None:
-        return
-    if item=='Clear':
-        expression.delete(0,END)
-    elif item=='Bs':
-        tempV = expression.get()
-        tempV = tempV[0:-1]
-        expression.delete(0,END)
-        expression.insert(0,tempV)
-    else:
-        expression.insert(END,str(item))
+
 
     
-def entry_callback(event):
-    global expression
-    expression=event.widget
+
 
 
 class My_App():
     def __init__(self,master,database_id):
+        self.expression=None
         self.master=master #instance of the Tk library
         pad=3
         self.database_id = database_id
@@ -93,6 +79,22 @@ class My_App():
         self._geom=geom
     #new window for the register window
 
+    def entry_callback(self,event):
+        self.expression=event.widget
+
+    def btn_click(self,item):
+
+        if self.expression is None:
+            return
+        if item=='Clear':
+            self.expression.delete(0,END)
+        elif item=='Bs':
+            tempV = self.expression.get()
+            tempV = tempV[0:-1]
+            self.expression.delete(0,END)
+            self.expression.insert(0,tempV)
+        else:
+            self.expression.insert(END,str(item))
 
         #callback for both register and login button
     def decision_handling(self,  window_name):
@@ -114,8 +116,8 @@ class My_App():
         """
 
     #variables for the user input
-        # self.username = StringVar()
-        # self.password = StringVar()
+        self.username = StringVar()
+        self.password = StringVar()
 
     # Set label for user's instruction
         detail_label1=Label(register_screen,
@@ -134,9 +136,9 @@ class My_App():
     # The Entry widget is a standard Tkinter widget used to enter or display a single line of text.
         username_entry = Entry(
                                 register_screen,
-                                textvariable=user_name,
+                                textvariable=self.username,
                             )
-        username_entry.bind('<Button-1>',entry_callback)
+        username_entry.bind('<Button-1>',self.entry_callback)
         username_entry.place(relx=0.5,rely=0.2,anchor='c')
     
 
@@ -150,11 +152,11 @@ class My_App():
 
     # Set password entry
         password_entry = Entry(
-                                    register_screen, textvariable=pass_word,
+                                    register_screen, textvariable=self.password,
                                     show='*',
                                     )
         password_entry.place(relx=0.5,rely=0.3,anchor='c')
-        password_entry.bind('<Button-1>',entry_callback)
+        password_entry.bind('<Button-1>',self.entry_callback)
 
         # Set register button
         decide_button=Button(
@@ -188,7 +190,7 @@ class My_App():
         for label in btn_list:
 
 
-            cmd = partial(btn_click,btn_list[btn_list.index(label)] )
+            cmd = partial(self.btn_click,btn_list[btn_list.index(label)] )
             btn[n] = Button(btns_frame ,text=label,height=3, width=6,command= cmd)
 
             # position the button
@@ -205,6 +207,18 @@ class My_App():
 #event handling function for the register and the login button
 
 
+
+# root=Tk()
+# #input_text=StringVar()
+# #user_name=StringVar()
+# #pass_word=StringVar()
+# device = Database()
+# localhost = 27017
+# database = "Medicare_report"
+# collections = "collection2"
+# device.initialize(localhost ,database, collections)
+# display = My_App(root,device)
+# root.mainloop()
 
 
 
