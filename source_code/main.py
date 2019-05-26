@@ -9,12 +9,10 @@ from BLE import BLE
 if __name__ == "__main__":
     root=Tk()
     #input_text=StringVar()
-
-    device = Database()
     localhost = 27017
     database = "Medicare_report"
     collections = "collection2"
-    device.initialize(localhost ,database, collections)
+    device = Database(localhost ,database, collections)
     display = My_App(root,device)
     root.mainloop()
 

@@ -17,7 +17,9 @@ class curry:
             kw.update(kwargs)
         else:
             kw = kwargs or self.kwargs
+
         return self.fun(*(self.pending + args), **kw)
+
 # ---------- code for class: curry (end) ---------------------
 
 
@@ -37,7 +39,7 @@ class My_App():
         self.master=master #instance of the Tk library
         pad=3
         self.database_id = database_id
-        self._geom='400x200+0+0'
+        self._geom='1024x800'
         self.master.geometry("{0}x{1}+0+0".format(
             self.master.winfo_screenwidth()-pad, self.master.winfo_screenheight()-pad))
         self.master.bind('<Escape>',self.toggle_geom)
@@ -60,15 +62,15 @@ class My_App():
         #widget for Login Button
         button1_title='Login'
         self.button1=Button(
-                            self.my_container1,text=button1_title,
-                            height='2',width='30',command=curry(self.decision_handling,'Login'))
+                            self.my_container1,text=button1_title,font=('Veranda',20),
+                            height='3',width='20',command=curry(self.decision_handling,'Login'))
         self.button1.place(relx='0.5',rely='0.5',anchor='c')
 
         #widget for register button
         button1_title='Register'
         self.button2=Button(
-                            self.my_container1,text=button1_title,
-                            height='2',width='30',command=curry(self.decision_handling,
+                            self.my_container1,text=button1_title,font=('Veranda',20),
+                            height='3',width='20',command=curry(self.decision_handling,
                             'Register' )
                             )
         self.button2.place(relx='0.5',rely='0.7',anchor ='c')
@@ -93,90 +95,109 @@ class My_App():
             tempV = tempV[0:-1]
             self.expression.delete(0,END)
             self.expression.insert(0,tempV)
+        elif item=="Space":
+            item=' '
+            self.expression.insert(END,str(item))
         else:
             self.expression.insert(END,str(item))
 
         #callback for both register and login button
-    def decision_handling(self,  window_name):
-        window_width=400
-        window_height=150
-    
-        window_name=window_name
-        register_screen=Toplevel()
-        register_screen.title(window_name)
-        register_screen.geometry('800x400')
-
-                #creating the input frame
-        """     input_frame = Frame(
-                            register_screen, width = window_width,
-                            height = window_height, bd = 0, highlightbackground = "black",
-                            highlightcolor = "black", highlightthickness = 1,
-                            )
-        input_frame.pack(side = TOP)
-        """
-
-    #variables for the user input
+    def Log_Reg(self,window_name):
         self.username = StringVar()
-        self.password = StringVar()
-
-    # Set label for user's instruction
-        detail_label1=Label(register_screen,
-                            text="Please enter details below",
-                            bg="cyan",
-                            )
-        detail_label1.place(relx=0.5,rely=0.05,anchor='c')
-
-    # Set username label
-        username_label = Label(register_screen, text="Username * ")
+        self.pass_date = StringVar()
+        temp = False
+        button = "Login"
+        show = '*'
+        callback = curry(self.database_id.Login,self.username)
+        if window_name == 'Login':
+            text1 = "UserID * "
+            text2 = "Password * "
+            temp = False
+            button = "Login"
+            y = 0.27
+            show = '*'
+            callback = curry(self.database_id.Login,self.username)
+        else:
+            text1 = "User Name * "
+            text2 = "Date of Birth * "
+            button = "Register"
+            temp = True
+            y = 0.25
+            show = None
+            callback = curry(self.database_id.Register, self.username,self.pass_date)
+         # Set username label
+        username_label = Label(self.register_screen, text=text1,font=self.label_font)
         username_label.place(relx=0.5,rely=0.15,anchor='c')
-
-
 
     # Set username entry
     # The Entry widget is a standard Tkinter widget used to enter or display a single line of text.
         username_entry = Entry(
-                                register_screen,
+                                self.register_screen,font=self.entry_font,
                                 textvariable=self.username,
                             )
+                            
         username_entry.bind('<Button-1>',self.entry_callback)
         username_entry.place(relx=0.5,rely=0.2,anchor='c')
-    
 
-
-
-
-
-    # Set password label
-        password_label = Label(register_screen, text="Password * ")
-        password_label.place(relx=0.5,rely=0.25,anchor='c')
+         # Set password label
+        password_label = Label(self.register_screen, text=text2,font=self.label_font)
+        password_label.place(relx=0.5,rely=0.27,anchor='c')
+        if temp == True:
+             # Set password label
+            password_label = Label(self.register_screen, text="Year/Month/day *",font=('Veranda',18))
+            password_label.place(relx=0.5,rely=0.3,anchor='c')
 
     # Set password entry
-        password_entry = Entry(
-                                    register_screen, textvariable=self.password,
-                                    show='*',
+        password = Entry(
+                                    self.register_screen, textvariable=self.pass_date,
+                                    show=show,font=self.entry_font,
                                     )
-        password_entry.place(relx=0.5,rely=0.3,anchor='c')
-        password_entry.bind('<Button-1>',self.entry_callback)
+        password.place(relx=0.5,rely=0.35,anchor='c')
+        password.bind('<Button-1>',self.entry_callback)
 
         # Set register button
         decide_button=Button(
-                                register_screen,command=curry(self.database_id.Login,3),
-                                text=window_name, width=10, height=1, bg="red",
+                                self.register_screen,command=callback,font = self.button_font,
+                                text=button, width=10, height=3, bg="red",
                                     )
         decide_button.place(relx=0.85,rely=0.35,anchor='c')
+
+
+    def decision_handling(self,  window_name):
+    
+        window_name=window_name
+        self.register_screen=Toplevel()
+        ws = self.register_screen.winfo_screenwidth()
+        hs = self.register_screen.winfo_screenheight()
+
+        self.register_screen.title(window_name)
+        self.register_screen.geometry('%dx%d'%(ws,hs))
+
+        self.entry_font=('Veranda',30)
+        self.label_font=('Veranda',25)
+        self.button_font=('Veranda',25)
+        
+
+    #variables for the user input
+        
+    #Login
+       
+        self.Log_Reg(window_name)
+    
+   
 
     #keypad gui
 
 
-        btns_frame = Frame(register_screen, width = 312, height = 272.5, bg = "grey")
-        btns_frame.place(relx=0.14,rely=0.4)
+        btns_frame = Frame(self.register_screen, width = 312, height = 272.5, bg = "grey")
+        btns_frame.place(relx=0.02,rely=0.43)
 
         btn_list = ['Clear',
-        'A',  'B',  'C',  'D',  'E',
-        'F',  'G',  'H',  'I',  'J',
-        'K','L','M','N','O','P','Q',
-        'R','S','T','U','V','W','X',
-        'Y','Z',
+        'Q',  'W',  'E',  'R',  'T',
+        'Y',  'U',  'I',  'O',  'P',
+        'A','S','D','F','G','H','J',
+        'K','L','Z','X','C','V','B',
+        'N','M',
         '0',  '1',  '2',  '3',  '4',
         '5',  '6',  '7',  '8',  '9','Bs' ]
         # create and position all buttons with a for-loop
@@ -188,10 +209,11 @@ class My_App():
         btn = list(range(len(btn_list)))
         
         for label in btn_list:
-
+            h=2
+            w=4
 
             cmd = partial(self.btn_click,btn_list[btn_list.index(label)] )
-            btn[n] = Button(btns_frame ,text=label,height=3, width=6,command= cmd)
+            btn[n] = Button(btns_frame ,font=self.button_font,text=label,height=2, width=4,command= cmd)
 
             # position the button
             btn[n].grid(row=r, column=c)
@@ -199,7 +221,7 @@ class My_App():
             n += 1
             # update row/column position
             c += 1
-            if c > 7:
+            if c > 9:
                 c = 0
                 r += 1
 
