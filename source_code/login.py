@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import *
 from functools import partial
 from database import Database
-
+from PIL import Image,ImageTk
 
 
 class curry:
@@ -157,12 +157,30 @@ class My_App():
 
         # Set register button
         decide_button=Button(
-                                self.register_screen,command=callback,font = self.button_font,
+                                self.register_screen,command=self.ImgShow,font = self.button_font,
                                 text=button, width=10, height=3, bg="red",
                                     )
         decide_button.place(relx=0.85,rely=0.35,anchor='c')
 
 
+    def ImgShow(self):
+        load = Image.open('medical.jpg')
+        render = ImageTk.PhotoImage(load)
+        canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
+        canvas.pack()
+        canvas.create_image(500,200,anchor = NW, image=render)  
+        text = Label(self.register_screen, text="San *",font=('Veranda',18))
+        text.place(relx=0.5,rely=0.3,anchor='c')
+        self.register_screen.mainloop()  
+
+        # img = Label(self, image = render)
+        # img.image = render
+        # img.place(x=0,y=0)
+
+    def ShowText(self):
+        text = Label(self, text= 'I am san')
+        text.pack()
+         
     def decision_handling(self,  window_name):
     
         window_name=window_name
