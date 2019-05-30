@@ -34,11 +34,13 @@ def event_lambda(f, *args, **kwds ):
 
 
 class My_App():
-    def __init__(self,master,database_id):
+    def __init__(self,master,database_id, Uart ,BIA):
         self.expression=None
         self.master=master #instance of the Tk library
         pad=3
         self.database_id = database_id
+        self.Uart = Uart
+        self.BIA =  BIA
         self._geom='1024x800'
         self.master.geometry("{0}x{1}+0+0".format(
             self.master.winfo_screenwidth()-pad, self.master.winfo_screenheight()-pad))
@@ -127,7 +129,7 @@ class My_App():
             callback = curry(self.database_id.Register, self.username,self.pass_date)
          # Set username label
         username_label = Label(self.register_screen, text=text1,font=self.label_font)
-        username_label.place(relx=0.5,rely=0.15,anchor='c')
+        username_label.place(relx=0.5,rely=0.1,anchor='c')
 
     # Set username entry
     # The Entry widget is a standard Tkinter widget used to enter or display a single line of text.
@@ -137,15 +139,15 @@ class My_App():
                             )
                             
         username_entry.bind('<Button-1>',self.entry_callback)
-        username_entry.place(relx=0.5,rely=0.2,anchor='c')
+        username_entry.place(relx=0.5,rely=0.17,anchor='c')
 
          # Set password label
         password_label = Label(self.register_screen, text=text2,font=self.label_font)
-        password_label.place(relx=0.5,rely=0.27,anchor='c')
+        password_label.place(relx=0.5,rely=0.24,anchor='c')
         if temp == True:
              # Set password label
             password_label = Label(self.register_screen, text="Year/Month/day *",font=('Veranda',18))
-            password_label.place(relx=0.5,rely=0.3,anchor='c')
+            password_label.place(relx=0.5,rely=0.28,anchor='c')
 
     # Set password entry
         password = Entry(
@@ -157,29 +159,104 @@ class My_App():
 
         # Set register button
         decide_button=Button(
-                                self.register_screen,command=self.ImgShow,font = self.button_font,
+                                self.register_screen,command=curry(self.diplay_output,1),font = self.button_font,
                                 text=button, width=10, height=3, bg="red",
                                     )
         decide_button.place(relx=0.85,rely=0.35,anchor='c')
-
-
-    def ImgShow(self):
-        load = Image.open('medical.jpg')
+        
+    def BIA_GUI(self):
+        
+        load = Image.open('GUIS/Selcouth_BIA.jpg')
         render = ImageTk.PhotoImage(load)
         canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
         canvas.pack()
-        canvas.create_image(500,200,anchor = NW, image=render)  
-        text = Label(self.register_screen, text="San *",font=('Veranda',18))
-        text.place(relx=0.5,rely=0.3,anchor='c')
+       
+        canvas.create_image(0,0,anchor = NW, image=render)
+
+        #Body weight
+        canvas.create_text(232,106,fill="white",font="Times 28 italic bold",text=str(self.database_id.User_database["Weight"]))
+        #Water Content
+        canvas.create_text(788,106,fill="white",font="Times 28 italic bold",text=str(self.database_id.User_database["Water"]))
+        #BMI
+        canvas.create_text(131,220,fill="white",font="Times 28 italic bold",text="2.5")
+        #Calorie
+        canvas.create_text(890,220,fill="white",font="Times 25 italic bold",text=str(self.database_id.User_database["Calorie"]))
+        #MuscleRate
+        canvas.create_text(232,372,fill="white",font="Times 28 italic bold",text="60")
+        #Body fat
+        canvas.create_text(789,372,fill="white",font="Times 28 italic bold",text=str(self.database_id.User_database["Fat"]))
+        #BoneMass
+        canvas.create_text(131,480,fill="white",font="Times 28 italic bold",text=str(self.database_id.User_database["BoneMass"]))
+        #Metabolic Age
+        canvas.create_text(890,480,fill="white",font="Times 28 italic bold",text=str(self.database_id.User_database["Mage"]))
+       
+        self.register_screen.mainloop()  
+        
+        
+    
+
+    def Bloodpressure(self):
+        
+        render = ImageTk.PhotoImage(Image.open('GUIS/Temp_Selcouth.jpg'))
+         #Body fat
+        text = Label(self.register_screen, text=self.User_database["Systolic"],font=('Veranda',18))
+        text.place(relx=0.7666,rely=0.63,anchor='c')
+        #Bone Mass
+        text = Label(self.register_screen, text=self.User_database["Diastolic"],font=('Veranda',18))
+        text.place(relx=0.122,rely=0.83,anchor='c')
+        #Metabolic Age
+        text = Label(self.register_screen, text=self.User_database["HearBeat"],font=('Veranda',18))
+        text.place(relx=0.87,rely=0.83,anchor='c')
+
+        self.canvas.create_image(0,0,anchor = NW, image=render)
+
+
+    def diplay_output(self, disp_num):
+        toshow = None
+        #self.Uart.write(str(disp_num))
+        data = []
+        if disp_num == 0:
+            #while self.status == False:
+            print("waiting\n")
+        
+            #for i in self.Uart.data :
+            #if i =='s':
+                
+            # else:
+                  #  data = data + str()
+                    
+                     
+    
+            self.Bloodpressure()
+            
+            
+        elif disp_num == 1:
+            self.BIA.connect()
+            self.BIA.manager.run()
+            self.database_id.User_database.update(self.BIA.body_composition())
+            
+            self.BIA_GUI()
+            
+        elif disp_num == 2:
+            load = Image.open('GUIS/Temp_Selcouth.jpg')
+            
+        elif disp_num == 3:
+            load = Image.open('GUIS/BP.jpg')
+        
+       
+    
+        self.register_screen.bind('<Motion>', self.motion)
         self.register_screen.mainloop()  
 
-        # img = Label(self, image = render)
-        # img.image = render
-        # img.place(x=0,y=0)
 
-    def ShowText(self):
-        text = Label(self, text= 'I am san')
-        text.pack()
+        
+    def motion(self, event):
+        x, y = event.x, event.y
+        print('{}, {}'.format(x/1024, y/600))
+
+
+
+
          
     def decision_handling(self,  window_name):
     
@@ -191,9 +268,9 @@ class My_App():
         self.register_screen.title(window_name)
         self.register_screen.geometry('%dx%d'%(ws,hs))
 
-        self.entry_font=('Veranda',30)
-        self.label_font=('Veranda',25)
-        self.button_font=('Veranda',25)
+        self.entry_font=('Veranda',25)
+        self.label_font=('Veranda',20)
+        self.button_font=('Veranda',20)
         
 
     #variables for the user input

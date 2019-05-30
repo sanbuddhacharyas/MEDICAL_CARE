@@ -5,7 +5,8 @@ import datetime
 
 class BLE(gatt.Device):
     
-    def define_variables(self, Age, Height, Gender, Write, manager):
+    def __init__(self, Age, Height, Gender, Write, manager,mac_address):
+        super().__init__(manager = manager , mac_address = mac_address)
         self.Age = Age
         self.Height = Height
         self.Gender = Gender
@@ -63,7 +64,7 @@ class BLE(gatt.Device):
         water = float(((self.values[1][9] << 8) | self.values[1][10]) / 10) #.% body composition
         MetabolicAge = int(self.values[1][11]) #In years
 
-        print ("weight ===================>" + str(weight) +".Kg")
+        print ("Weight ===================>" + str(weight) +".Kg")
         print ("Fat ======================>" + str(Fat) + "%")
         print ("Calorie ==================>" + str(Calorie) + "Kcal")
         print ("Bone_mass ================>" + str(bone_mass) + "Kg")
@@ -75,7 +76,7 @@ class BLE(gatt.Device):
                 "Calorie" : Calorie, 
                 "BoneMass": bone_mass, 
                 "Water" : water , 
-                "MetabolicAge" : MetabolicAge }
+                "MAge" : MetabolicAge }
                 
             
     def services_resolved(self):
@@ -96,7 +97,6 @@ class BLE(gatt.Device):
                         self.Read = False
 
 
-                    
     def characteristic_value_updated(self, characteristic, value):
         print("Firmware version:", value)
         
@@ -105,9 +105,11 @@ class BLE(gatt.Device):
             self.ReadStatus = True
             
         if len(value) == 20 and self.ReadStatus == True :
-            if id(value) != id(self.values[0]):
+            if self.count == 0:
                 self.values.append(value)
-                self.count = 1 + self.count
-                if self.count == 2:
+                self.count = self.count + 1
+                
+            else:
+                if value != self.values[0]:
+                    self.values.append(value)
                     self.manager.stop()
-                    self.count =0
