@@ -9,15 +9,18 @@ class UART():
         GPIO.setup(20,GPIO.IN, pull_up_down = GPIO.PUD_UP)
         GPIO.add_event_detect(pin_num, GPIO.FALLING, callback = self.callback, bouncetime= 100)
         self.status = False
+        
 
     def callback(self,channel):
+        if self.status == False:
+            self.data = []
         print("I am comming\n")
-        self.data = []
         while self.ser.inWaiting() > 0:
             received = self.ser.read()
-            self.data.append(received)
-            print(received)
-        self.status = True
+            self.data.append(received.decode())
+            print(received.decode())
+        if self.data != []:
+            self.status = True
     
     def write(self, data_num):
         self.ser.write(data_num.encode())

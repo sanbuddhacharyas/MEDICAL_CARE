@@ -10,11 +10,16 @@ class Database():
         self.coll = self.db[collections]
         self.User_database = {
                                "Height" : None,
-                               "Mage"   : None,
-                               "Stolic" : None,
+                               "Systolic" : None,
                                "Diastolic" :None,
                                "HearBeat" : None,
                                "Temp" : None,
+                               "Weight" : None, 
+                                "Fat" : None, 
+                                "Calorie" : None, 
+                                "BoneMass": None, 
+                                "Water" : None , 
+                                "MAge" : None
                     
                               }
         self.User_id = None

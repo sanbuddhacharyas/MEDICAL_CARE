@@ -1,8 +1,12 @@
 import tkinter as tk
+import imageio
 from tkinter import *
 from functools import partial
 from database import Database
 from PIL import Image,ImageTk
+import numpy as np
+import time
+
 
 
 class curry:
@@ -46,6 +50,14 @@ class My_App():
             self.master.winfo_screenwidth()-pad, self.master.winfo_screenheight()-pad))
         self.master.bind('<Escape>',self.toggle_geom)
         self.master.title("Selcouth Health")
+        self.images = []
+        for i in range(5):
+            self.images.append(Image.open('GUIS/Loading_Screens/'+str(i)+'.jpg' ))
+
+        #np.save("loading.npy", images)
+        #print("images saved")
+            
+        
 
         # creating the container for the initial screen
         self.my_container1=Frame(self.master,bg='cadetblue4')
@@ -129,7 +141,7 @@ class My_App():
             callback = curry(self.database_id.Register, self.username,self.pass_date)
          # Set username label
         username_label = Label(self.register_screen, text=text1,font=self.label_font)
-        username_label.place(relx=0.5,rely=0.1,anchor='c')
+        username_label.place(relx=0.5,rely=0.08,anchor='c')
 
     # Set username entry
     # The Entry widget is a standard Tkinter widget used to enter or display a single line of text.
@@ -139,11 +151,11 @@ class My_App():
                             )
                             
         username_entry.bind('<Button-1>',self.entry_callback)
-        username_entry.place(relx=0.5,rely=0.17,anchor='c')
+        username_entry.place(relx=0.5,rely=0.15,anchor='c')
 
          # Set password label
         password_label = Label(self.register_screen, text=text2,font=self.label_font)
-        password_label.place(relx=0.5,rely=0.24,anchor='c')
+        password_label.place(relx=0.5,rely=0.23,anchor='c')
         if temp == True:
              # Set password label
             password_label = Label(self.register_screen, text="Year/Month/day *",font=('Veranda',18))
@@ -159,20 +171,20 @@ class My_App():
 
         # Set register button
         decide_button=Button(
-                                self.register_screen,command=curry(self.diplay_output,1),font = self.button_font,
+                                self.register_screen,command=curry(self.diplay_output,0),font = self.button_font,
                                 text=button, width=10, height=3, bg="red",
                                     )
-        decide_button.place(relx=0.85,rely=0.35,anchor='c')
+        decide_button.place(relx=0.85,rely=0.32,anchor='c')
         
     def BIA_GUI(self):
+         
         
-        load = Image.open('GUIS/Selcouth_BIA.jpg')
-        render = ImageTk.PhotoImage(load)
+        render = ImageTk.PhotoImage(Image.open('GUIS/Selcouth_BIA.jpg'))
         canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
         canvas.pack()
        
         canvas.create_image(0,0,anchor = NW, image=render)
-
+        
         #Body weight
         canvas.create_text(232,106,fill="white",font="Times 28 italic bold",text=str(self.database_id.User_database["Weight"]))
         #Water Content
@@ -188,49 +200,112 @@ class My_App():
         #BoneMass
         canvas.create_text(131,480,fill="white",font="Times 28 italic bold",text=str(self.database_id.User_database["BoneMass"]))
         #Metabolic Age
-        canvas.create_text(890,480,fill="white",font="Times 28 italic bold",text=str(self.database_id.User_database["Mage"]))
-       
-        self.register_screen.mainloop()  
+        canvas.create_text(890,480,fill="white",font="Times 28 italic bold",text=str(self.database_id.User_database["MAge"]))
+        
+        canvas.image = render
+        self.register_screen.update()  
         
         
     
 
     def Bloodpressure(self):
         
-        render = ImageTk.PhotoImage(Image.open('GUIS/Temp_Selcouth.jpg'))
-         #Body fat
-        text = Label(self.register_screen, text=self.User_database["Systolic"],font=('Veranda',18))
-        text.place(relx=0.7666,rely=0.63,anchor='c')
-        #Bone Mass
-        text = Label(self.register_screen, text=self.User_database["Diastolic"],font=('Veranda',18))
-        text.place(relx=0.122,rely=0.83,anchor='c')
-        #Metabolic Age
-        text = Label(self.register_screen, text=self.User_database["HearBeat"],font=('Veranda',18))
-        text.place(relx=0.87,rely=0.83,anchor='c')
-
+        render = ImageTk.PhotoImage(Image.open('GUIS/bp.jpg'))
+        
+       
         self.canvas.create_image(0,0,anchor = NW, image=render)
+         #Systolic
+        self.canvas.create_text(706,130,fill="white",font="Times 50 italic bold",text=str(self.database_id.User_database["Systolic"]))
+       
+        #Disatolic
+        self.canvas.create_text(706,309,fill="white",font="Times 50 italic bold",text=str(self.database_id.User_database["Diastolic"]))
+        #HeartBeat
+        self.canvas.create_text(706,495,fill="white",font="Times 50 italic bold",text=str(self.database_id.User_database["HearBeat"]))
+         
+
+        self.canvas.image = render
+    
+        self.register_screen.update()  
 
 
+    def temp(self):
+        render = ImageTk.PhotoImage(Image.open('GUIS/Temp_Selcouth.jpg'))
+        canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
+        canvas.pack()
+       
+        canvas.create_image(0,0,anchor = NW, image=render)
+        canvas.create_text(217,172,fill="red",font="Times 40 italic bold",text=str(self.database_id.User_database["Temp"]))
+        f = float("{0:.2f}".format(self.database_id.User_database["Temp"] * 1.8+ 32))
+        
+        canvas.create_text(235,358,fill="red",font="Times 40 italic bold",text=str(f))
+
+        canvas.image = render
+        self.register_screen.update()  
+        
+
+    def show_video(self):
+        
+        canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
+        canvas.pack()
+
+        c = np.load("show.npy")
+        
+          
+            
+    
+        
+       
+        
+            
     def diplay_output(self, disp_num):
         toshow = None
-        #self.Uart.write(str(disp_num))
-        data = []
-        if disp_num == 0:
-            #while self.status == False:
-            print("waiting\n")
         
-            #for i in self.Uart.data :
-            #if i =='s':
+        data = 0
+        
+        if disp_num == 0:
+            self.Uart.write(str(disp_num))
+            i=0
+            self.canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
+            self.canvas.pack()
+           
+            while self.Uart.status == False:
+                render = ImageTk.PhotoImage(self.images[i])
+                self.canvas.create_image(0,0,anchor = NW, image=render)
+                self.register_screen.update()
+                time.sleep(0.5)
+                i = i +1
+                if i > 4:
+                    i = 0
+                print("BP"+str(i))
+            
+            print(self.Uart.data)
+            
+            for i in self.Uart.data:
                 
-            # else:
-                  #  data = data + str()
+                if i == 's':
+                    self.database_id.User_database["Systolic"] = data
+                    print("s"+str(data))
+                    data = 0
                     
-                     
-    
+                elif i == 'd':
+                    self.database_id.User_database["Diastolic"] = data
+                    print("d"+str(data))
+                    data = 0
+                    
+                elif i == 'h':
+                    print("h"+str(data))
+                    self.database_id.User_database["HearBeat"] = data
+                    data = 0
+                    
+                elif int(i)>=0 and int(i) =< 9:
+                    data = 10*data + int(i)
+                    
+                    
             self.Bloodpressure()
-            
-            
+            self.Uart.status == False
+                
         elif disp_num == 1:
+
             self.BIA.connect()
             self.BIA.manager.run()
             self.database_id.User_database.update(self.BIA.body_composition())
@@ -238,21 +313,47 @@ class My_App():
             self.BIA_GUI()
             
         elif disp_num == 2:
-            load = Image.open('GUIS/Temp_Selcouth.jpg')
+            self.Uart.write(str(disp_num))
+            i=0
+            while self.Uart.status == False:
+                render = ImageTk.PhotoImage(self.images[i])
+                canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
+                canvas.pack()
+                canvas.create_image(0,0,anchor = NW, image=render)
+                canvas.image = render
+                self.register_screen.update()
+                i = i +1
+                if i > 4:
+                    i = 0
+        
+                
+                print("Temperature")
+                
+            print(self.Uart.data)
+            
+            for i in self.Uart.data:   
+                if i == 't':
+                    self.database_id.User_database["Temp"] = (data / 1000)
+                    print("s"+str(data/1000))
+                    data = 0 
+                else:
+                    data = 10*data + int(i)
+                    
+            self.temp()
             
         elif disp_num == 3:
             load = Image.open('GUIS/BP.jpg')
         
        
     
-        self.register_screen.bind('<Motion>', self.motion)
+        #self.register_screen.bind('<Motion>', self.motion)
         self.register_screen.mainloop()  
 
 
         
     def motion(self, event):
         x, y = event.x, event.y
-        print('{}, {}'.format(x/1024, y/600))
+        print('{}, {}'.format(x, y))
 
 
 
