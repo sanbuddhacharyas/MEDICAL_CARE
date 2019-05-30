@@ -171,7 +171,7 @@ class My_App():
 
         # Set register button
         decide_button=Button(
-                                self.register_screen,command=curry(self.diplay_output,0),font = self.button_font,
+                                self.register_screen,command=curry(self.diplay_output,2),font = self.button_font,
                                 text=button, width=10, height=3, bg="red",
                                     )
         decide_button.place(relx=0.85,rely=0.32,anchor='c')
@@ -230,16 +230,14 @@ class My_App():
 
     def temp(self):
         render = ImageTk.PhotoImage(Image.open('GUIS/Temp_Selcouth.jpg'))
-        canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
-        canvas.pack()
        
-        canvas.create_image(0,0,anchor = NW, image=render)
-        canvas.create_text(217,172,fill="red",font="Times 40 italic bold",text=str(self.database_id.User_database["Temp"]))
+        self.canvas.create_image(0,0,anchor = NW, image=render)
+        self.canvas.create_text(217,172,fill="red",font="Times 40 italic bold",text=str(self.database_id.User_database["Temp"]))
         f = float("{0:.2f}".format(self.database_id.User_database["Temp"] * 1.8+ 32))
         
-        canvas.create_text(235,358,fill="red",font="Times 40 italic bold",text=str(f))
+        self.canvas.create_text(235,358,fill="red",font="Times 40 italic bold",text=str(f))
 
-        canvas.image = render
+        self.canvas.image = render
         self.register_screen.update()  
         
 
@@ -297,7 +295,7 @@ class My_App():
                     self.database_id.User_database["HearBeat"] = data
                     data = 0
                     
-                elif int(i)>=0 and int(i) =< 9:
+                else :
                     data = 10*data + int(i)
                     
                     
@@ -315,12 +313,11 @@ class My_App():
         elif disp_num == 2:
             self.Uart.write(str(disp_num))
             i=0
+            self.canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
+            self.canvas.pack()
             while self.Uart.status == False:
                 render = ImageTk.PhotoImage(self.images[i])
-                canvas = Canvas(self.register_screen, width = self.register_screen.winfo_screenwidth(), height = self.register_screen.winfo_screenheight(), bg = "blue")  
-                canvas.pack()
-                canvas.create_image(0,0,anchor = NW, image=render)
-                canvas.image = render
+                self.canvas.create_image(0,0,anchor = NW, image=render)
                 self.register_screen.update()
                 i = i +1
                 if i > 4:
