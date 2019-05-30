@@ -8,7 +8,15 @@ class Database():
         self.client = MongoClient('localhost' , localhost  )
         self.db = self.client[database]
         self.coll = self.db[collections]
-        self.User_database = None
+        self.User_database = {
+                               "Height" : None,
+                               "Mage"   : None,
+                               "Stolic" : None,
+                               "Diastolic" :None,
+                               "HearBeat" : None,
+                               "Temp" : None,
+                    
+                              }
         self.User_id = None
 
     def DateDiff(self,d1,d2):
